@@ -10,7 +10,6 @@ describe('Authorization tests', () => {
                 .post('/v5/user/login')
                 .send({email: "akuna@matata.com", password: "AkunaMatata123"})
             expect(res.statusCode).to.eq(200)
-
         })
 
         it('Response body returns correct message', async () => {
@@ -42,5 +41,28 @@ describe('Authorization tests', () => {
         })
     })
 
-    describe('Authentication tests negative')
+    describe('Authentication tests negative', () => {
+        it('Login with invalid password', async () => {
+            let res= await request('https://clientbase-server.herokuapp.com')
+                .post('/v5/user/login')
+                .send({email: "akuna@matata.com", password: "Booboo1"})
+            expect(res.statusCode).to.eq(400)
+        })
+
+        it('Login with invalid email', async () => {
+            let res= await request('https://clientbase-server.herokuapp.com')
+                .post('/v5/user/login')
+                .send({email: "akuna1@matata.com", password: "AkunaMatata123"})
+            expect(res.statusCode).to.eq(400)
+        })
+
+        it('Response body returns error message', async () => {
+            let res= await request('https://clientbase-server.herokuapp.com')
+                .post('/v5/user/login')
+                .send({email: "akuna@matata.com", password: "Booboo1"})
+            expect(res.body.message).to.eq('Auth failed')
+        })
+
+
+    })
 })
