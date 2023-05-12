@@ -4,44 +4,36 @@ import 'dotenv/config'
 
 describe('Authorization tests', () => {
     describe('Authorization with valid data', () => {
-
-        it('Response status code is 200', async () => {
-            let res= await request(process.env.BASE_URL)
+        let res
+        before(async () => {
+            res= await request(process.env.BASE_URL)
                 .post('/v5/user/login')
                 .send({email: process.env.EMAIL, password: process.env.PASSWORD})
+        })
+
+        it('Response status code is 200', async () => {
             expect(res.statusCode).to.eq(200)
         })
 
         it('Response body returns correct message', async () => {
-            let res= await request(process.env.BASE_URL)
-                .post('/v5/user/login')
-                .send({email: process.env.EMAIL, password: process.env.PASSWORD})
             expect(res.body.message).to.eq('Auth success')
         })
 
         it('Response has a token', async () => {
-            let res= await request(process.env.BASE_URL)
-                .post('/v5/user/login')
-                .send({email: process.env.EMAIL, password: process.env.PASSWORD})
             expect(res.body.payload.token).to.be.a('string')
         })
 
         it('Response body contains user ID', async() => {
-            let res= await request(process.env.BASE_URL)
-                .post('/v5/user/login')
-                .send({email: process.env.EMAIL, password: process.env.PASSWORD})
             expect(res.body.payload.userId).to.be.a('string')
         })
 
         it('Response does not contain password', async () => {
-            let res= await request(process.env.BASE_URL)
-                .post('/v5/user/login')
-                .send({email: process.env.EMAIL, password: process.env.PASSWORD})
             expect(res).to.not.have.property('password')
         })
     })
 
     describe('Authentication tests negative', () => {
+
         it('Login with invalid password', async () => {
             let res= await request(process.env.BASE_URL)
                 .post('/v5/user/login')
