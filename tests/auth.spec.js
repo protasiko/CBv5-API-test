@@ -1,14 +1,12 @@
 import {expect} from 'chai'
-import request from 'supertest'
 import 'dotenv/config'
+import {login} from "../helpers/general-helper";
 
 describe('Authorization tests', () => {
     describe('Authorization with valid data', () => {
         let response
         before(async () => {
-            response= await request(process.env.BASE_URL)
-                .post('/v5/user/login')
-                .send({email: process.env.EMAIL, password: process.env.PASSWORD})
+            response= await login(process.env.EMAIL, process.env.PASSWORD)
         })
 
         it('Response status code is 200', async () => {
@@ -35,23 +33,17 @@ describe('Authorization tests', () => {
     describe('Authentication tests negative', () => {
 
         it('Login with invalid password', async () => {
-            let response= await request(process.env.BASE_URL)
-                .post('/v5/user/login')
-                .send({email: process.env.EMAIL, password: "Booboo1"})
+            let response= await login(process.env.EMAIL, "Booboo1")
             expect(response.statusCode).to.eq(400)
         })
 
         it('Login with invalid email', async () => {
-            let response= await request(process.env.BASE_URL)
-                .post('/v5/user/login')
-                .send({email: "akuna1@matata.com", password: process.env.PASSWORD})
+            let response= await login("akuna1@matata.com", process.env.PASSWORD)
             expect(response.statusCode).to.eq(400)
         })
 
         it('Response body returns error message', async () => {
-            let response= await request(process.env.BASE_URL)
-                .post('/v5/user/login')
-                .send({email: process.env.EMAIL, password: "Booboo1"})
+            let response= await login(process.env.EMAIL, "Booboo1")
             expect(response.body.message).to.eq('Auth failed')
         })
 
