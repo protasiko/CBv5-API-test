@@ -1,7 +1,11 @@
-import 'dotenv/config';
-import {login} from "../helpers/general-helper";
+import 'dotenv/config'
+import request from 'supertest'
+
 
 before(async () => {
-   let response= await login(process.env.EMAIL, process.env.PASSWORD)
-    process.env.TOKEN = response.body.payload.token
+    const res = await request(process.env.BASE_URL)
+        .post('/v5/user/login')
+        .send({email: process.env.EMAIL, password: process.env.PASSWORD })
+
+    process.env.TOKEN = res.body.payload.token
 })

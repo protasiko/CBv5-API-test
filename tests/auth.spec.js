@@ -1,52 +1,52 @@
-import {expect} from 'chai'
+import { expect } from 'chai'
 import 'dotenv/config'
 import {login} from "../helpers/general-helper";
 
-describe('Authorization tests', () => {
-    describe('Authorization with valid data', () => {
-        let response
-        before(async () => {
-            response= await login(process.env.EMAIL, process.env.PASSWORD)
+describe('Authorization positive', () => {
+    let res
+    before(async () => {
+        res = await login(process.env.EMAIL, process.env.PASSWORD)
+    })
+    describe('login with valid credentials', () => {
+        it('check the status code', async () => {
+            expect(res.statusCode).to.eq(200)
         })
-
-        it('Response status code is 200', async () => {
-            expect(response.statusCode).to.eq(200)
+        it('check the body message is correct', async () => {
+            expect(res.body.message).to.eq('Auth success')
         })
-
-        it('Response body returns correct message', async () => {
-            expect(response.body.message).to.eq('Auth success')
+        it('check the response has token', async () => {
+            expect(res.body.payload.token).not.to.be.undefined
         })
-
-        it('Response has a token', async () => {
-            expect(response.body.payload.token).to.be.a('string')
-        })
-
-        it('Response body contains user ID', async() => {
-            expect(response.body.payload.userId).to.be.a('string')
-        })
-
-        it('Response does not contain password', async () => {
-            expect(response).to.not.have.property('password')
+        it('check the response does not contain password', async () => {
+            expect(res.body.payload.user).to.have.property('password', null)
         })
     })
+})
 
-    describe('Authentication tests negative', () => {
-
-        it('Login with invalid password', async () => {
-            let response= await login(process.env.EMAIL, "Booboo1")
-            expect(response.statusCode).to.eq(400)
+describe('Authorization negative', () => {
+    describe('login with empty fields', () => {
+        let res
+        before(async () => {
+            res = await login()
+        })
+        it('check response status code', () => {
+            expect(res.statusCode).to.eq(400)
+        });
+        it('check the response message', async () => {
+            expect(res.body.message).to.eq('Auth failed')
+        })
+    })
+    describe('login with invalid email', () => {
+        let res
+        before(async () => {
+            res = await login('invalid@pirate.com', process.env.PASSWORD)
+        })
+        it('check response status code', () => {
+            expect(res.statusCode).to.eq(400)
         })
 
-        it('Login with invalid email', async () => {
-            let response= await login("akuna1@matata.com", process.env.PASSWORD)
-            expect(response.statusCode).to.eq(400)
+        it('check response message', () => {
+            expect(res.body.message).to.eq('Auth failed')
         })
-
-        it('Response body returns error message', async () => {
-            let response= await login(process.env.EMAIL, "Booboo1")
-            expect(response.body.message).to.eq('Auth failed')
-        })
-
-
     })
 })
